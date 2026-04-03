@@ -24,6 +24,30 @@ defmodule PhoenixAuthWeb.UserLive.Registration do
 
         <.form for={@form} id="registration_form" phx-submit="save" phx-change="validate">
           <.input
+            field={@form[:first_name]}
+            type="text"
+            label="First name"
+            autocomplete="given-name"
+            spellcheck="false"
+            required
+          />
+          <.input
+            field={@form[:last_name]}
+            type="text"
+            label="Last name"
+            autocomplete="family-name"
+            spellcheck="false"
+            required
+          />
+          <.input
+            field={@form[:DOB]}
+            type="date"
+            label="Date of Birth"
+            autocomplete="bday"
+            spellcheck="false"
+            required
+          />
+          <.input
             field={@form[:email]}
             type="email"
             label="Email"
@@ -31,6 +55,19 @@ defmodule PhoenixAuthWeb.UserLive.Registration do
             spellcheck="false"
             required
             phx-mounted={JS.focus()}
+          />
+          <.input
+            field={@form[:password]}
+            type="password"
+            label="Password"
+            autocomplete="new-password"
+            required
+          />
+          <.input
+            field={@form[:password_confirmation]}
+            type="password"
+            label="Confirm password"
+            autocomplete="new-password"
           />
 
           <.button phx-disable-with="Creating account..." class="btn btn-primary w-full">
