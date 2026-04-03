@@ -131,4 +131,5 @@ defmodule PhoenixAuthWeb.UserLive.Login do
   defp local_mail_adapter? do
     Application.get_env(:phoenix_auth, PhoenixAuth.Mailer)[:adapter] == Swoosh.Adapters.Local
   end
+  
 end
