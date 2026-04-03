@@ -2,112 +2,94 @@ defmodule PhoenixAuthWeb.UserLive.Login do
   use PhoenixAuthWeb, :live_view
 
   alias PhoenixAuth.Accounts
-  import Phoenix.LiveView.Helpers
 
   @impl true
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <div class="flex justify-center items-center min-h-screen bg-gray-50">
-        <div class="bg-white shadow-md rounded-lg w-full max-w-md p-8 space-y-6">
-          <div class="text-center">
-            <h1 class="text-2xl font-bold text-gray-800">Log in</h1>
-            <p class="mt-2 text-sm text-gray-600">
+      <div class="mx-auto max-w-sm space-y-4 -mt-34">
+        <div class="text-center">
+          <.header>
+            <p>Log in</p>
+            <:subtitle>
               <%= if @current_scope do %>
-                Reauthenticate to continue.
+                You need to reauthenticate to perform sensitive actions on your account.
               <% else %>
                 Don't have an account? <.link
                   navigate={~p"/users/register"}
-                  class="text-blue-600 font-semibold hover:underline"
+                  class="font-semibold text-brand hover:underline"
                   phx-no-format
-                >Sign up</.link>
+                >Sign up</.link> for an account now.
               <% end %>
+            </:subtitle>
+          </.header>
+        </div>
+
+        <div :if={local_mail_adapter?()} class="alert alert-info">
+          <.icon name="hero-information-circle" class="size-6 shrink-0" />
+          <div>
+            <p>You are running the local mail adapter.</p>
+            <p>
+              To see sent emails, visit <.link href="/dev/mailbox" class="underline">the mailbox page</.link>.
             </p>
           </div>
-
-          <%= if local_mail_adapter?() do %>
-            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 text-blue-700 text-sm rounded-md">
-              You are running the local mail adapter.
-              Visit <.link href="/dev/mailbox" class="underline">the mailbox</.link>
-              to see sent emails.
-            </div>
-          <% end %>
-          
-    <!-- Magic link form -->
-          <.form
-            :let={f}
-            for={@form}
-            id="login_form_magic"
-            action={~p"/users/log-in"}
-            phx-submit="submit_magic"
-            class="space-y-4"
-          >
-            <.input
-              readonly={!!@current_scope}
-              field={f[:email]}
-              type="email"
-              label="Email"
-              autocomplete="username"
-              required
-              phx-mounted={JS.focus()}
-              class="input input-bordered w-full"
-            />
-            <.button class="w-full bg-blue-600 text-white font-semibold py-2 rounded hover:bg-blue-700">
-              Log in with Email <span aria-hidden="true">→</span>
-            </.button>
-          </.form>
-
-          <div class="flex items-center my-4">
-            <hr class="flex-grow border-gray-300" />
-            <span class="mx-2 text-gray-400 text-sm">or</span>
-            <hr class="flex-grow border-gray-300" />
-          </div>
-          
-    <!-- Password login -->
-          <.form
-            :let={f}
-            for={@form}
-            id="login_form_password"
-            action={~p"/users/log-in"}
-            phx-submit="submit_password"
-            phx-trigger-action={@trigger_submit}
-            class="space-y-4"
-          >
-            <.input
-              readonly={!!@current_scope}
-              field={f[:email]}
-              type="email"
-              label="Email"
-              autocomplete="username"
-              required
-              class="input input-bordered w-full"
-            />
-            <.input
-              field={@form[:password]}
-              type="password"
-              label="Password"
-              autocomplete="current-password"
-              class="input input-bordered w-full"
-            />
-            <div class="flex items-center justify-between text-sm text-gray-600">
-              <label class="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  class="form-checkbox"
-                  name={@form[:remember_me].name}
-                  value="true"
-                />
-                <span>Remember me</span>
-              </label>
-              <.link navigate={~p"/users/reset-password"} class="hover:underline text-blue-600">
-                Forgot password?
-              </.link>
-            </div>
-            <.button class="w-full bg-blue-600 text-white font-semibold py-2 rounded hover:bg-blue-700">
-              Log in <span aria-hidden="true">→</span>
-            </.button>
-          </.form>
         </div>
+
+        <.form
+          :let={f}
+          for={@form}
+          id="login_form_magic"
+          action={~p"/users/log-in"}
+          phx-submit="submit_magic"
+        >
+          <.input
+            readonly={!!@current_scope}
+            field={f[:email]}
+            type="email"
+            label="Email"
+            autocomplete="username"
+            spellcheck="false"
+            required
+            phx-mounted={JS.focus()}
+          />
+          <.button class="btn btn-primary w-full">
+            Log in with email <span aria-hidden="true">→</span>
+          </.button>
+        </.form>
+
+        <div class="divider">or</div>
+
+        <.form
+          :let={f}
+          for={@form}
+          id="login_form_password"
+          action={~p"/users/log-in"}
+          phx-submit="submit_password"
+          phx-trigger-action={@trigger_submit}
+        >
+          <.input
+            readonly={!!@current_scope}
+            field={f[:email]}
+            type="email"
+            label="Email"
+            autocomplete="username"
+            spellcheck="false"
+            required
+          />
+          <.input
+            field={@form[:password]}
+            type="password"
+            label="Password"
+            autocomplete="current-password"
+            spellcheck="false"
+          />
+          <.button class="btn btn-primary w-full" name={@form[:remember_me].name} value="true">
+            Log in and stay logged in <span aria-hidden="true">→</span>
+          </.button>
+          <.button class="btn btn-primary btn-soft w-full mt-2">
+            Log in only this time
+          </.button>
+        </.form>
       </div>
     </Layouts.app>
     """
@@ -149,4 +131,5 @@ defmodule PhoenixAuthWeb.UserLive.Login do
   defp local_mail_adapter? do
     Application.get_env(:phoenix_auth, PhoenixAuth.Mailer)[:adapter] == Swoosh.Adapters.Local
   end
+  
 end
