@@ -56,20 +56,6 @@ defmodule PhoenixAuthWeb.UserLive.Registration do
             required
             phx-mounted={JS.focus()}
           />
-          <.input
-            field={@form[:password]}
-            type="password"
-            label="Password"
-            autocomplete="new-password"
-            required
-          />
-          <.input
-            field={@form[:password_confirmation]}
-            type="password"
-            label="Confirm password"
-            autocomplete="new-password"
-          />
-
           <.button phx-disable-with="Creating account..." class="btn btn-primary w-full">
             Create an account
           </.button>
