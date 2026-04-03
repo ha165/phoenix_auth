@@ -11,10 +11,10 @@ defmodule PhoenixAuth.Accounts.User do
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
 
-    field :confirmed_at, :utc_datetime
+    field :confirmed_at, :utc_datetime_usec
     field :authenticated_at, :utc_datetime, virtual: true
 
-    timestamps(type: :utc_datetime)
+    timestamps(type: :utc_datetime_usec)
   end
 
   @doc """
@@ -22,13 +22,12 @@ defmodule PhoenixAuth.Accounts.User do
   """
   def registration_changeset(user, attrs) do
     user
-    |> cast(attrs, [:first_name, :last_name, :DOB, :email, :password])
-    |> validate_required([:first_name, :last_name, :DOB, :email, :password])
+    |> cast(attrs, [:first_name, :last_name, :DOB, :email])
+    |> validate_required([:first_name, :last_name, :DOB, :email])
     |> validate_length(:first_name, max: 50)
     |> validate_length(:last_name, max: 50)
     |> validate_dob()
     |> validate_email()
-    |> validate_password()
   end
 
   @doc """
